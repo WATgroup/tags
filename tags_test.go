@@ -99,3 +99,12 @@ func TestRemovals(t *testing.T) {
 	
 	assert.True(t, tags.EqualSet(ts, tags.FromStrings("four","one","three","two")))
 }
+
+func TestContains(t *testing.T) {
+	
+	ts := g_tagset.Clone()
+
+	assert.True(t, ts.Contains(tags.New("one")))
+	assert.True(t, ts.ContainsString("three"))
+
+}

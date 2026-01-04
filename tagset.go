@@ -68,7 +68,50 @@ func EqualSet(t1, t2 Tagset) bool {
 	return true
 }
 
-//////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+
+func (x Tagset) Len() int {
+	return len(x)
+}
+
+func (x Tagset) IsEmpty() bool {
+	return 0 == len(x)
+}
+
+// Check if tagset contains a tag
+// Linear search will be optimal, given that tagsets are tipically small
+func (x Tagset) Contains(t tag) bool {
+	for i := range x {
+		if t == x[i] {
+			return true
+		}
+	}
+	return false
+}
+
+func (x Tagset) ContainsString(t string) bool {
+	for i := range x {
+		if tag(t) == x[i] {
+			return true
+		}
+	}
+	return false
+}
+
+// Index returns the index of the first occurrence of v in s,
+// or -1 if not present.
+func (x Tagset) Index(t tag) int {
+	for i := range x {
+		if t == x[i] {
+			return i
+		}
+	}
+	return -1
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 
 func (x Tagset) Clone() (ret Tagset) {
 	if 0 == len(x) {
@@ -108,7 +151,6 @@ func (x *Tagset) Compact() {
 					i++
 				}
 			}
-
 			clear(s[i:]) // zero/nil out the obsolete elements, for GC
 			*x = s[:i]
 		}
@@ -116,21 +158,3 @@ func (x *Tagset) Compact() {
 	return
 }
 
-// Index returns the index of the first occurrence of v in s,
-// or -1 if not present.
-func (x Tagset) Index(t tag) int {
-	for i := range x {
-		if t == x[i] {
-			return i
-		}
-	}
-	return -1
-}
-
-func (x Tagset) Len() int {
-	return len(x)
-}
-
-func (x Tagset) IsEmpty() bool {
-	return 0 == len(x)
-}
