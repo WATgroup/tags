@@ -10,7 +10,6 @@ const k_TAGCOLLSZ = 3
 
 type Tagset []tag
 
-
 func NewTagset() Tagset {
 	return make(Tagset, 0, k_TAGCOLLSZ)
 }
@@ -48,7 +47,7 @@ func (x *Tagset) Remove(t tag) {
 	i := 0
 	for ; i < len(s); i++ {
 		if t == s[i] {
-			copy(s[i:],s[i+1:])
+			copy(s[i:], s[i+1:])
 			break
 		}
 	}
@@ -67,7 +66,6 @@ func EqualSet(t1, t2 Tagset) bool {
 	}
 	return true
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -110,16 +108,15 @@ func (x Tagset) Index(t tag) int {
 	return -1
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 
 func (x Tagset) Clone() (ret Tagset) {
 	if 0 == len(x) {
 		return nil
 	}
-	
-	ret = make(Tagset,len(x))
-	for i,t := range x {
+
+	ret = make(Tagset, len(x))
+	for i, t := range x {
 		ret[i] = t
 	}
 	return // ret already contains result
@@ -157,4 +154,3 @@ func (x *Tagset) Compact() {
 	}
 	return
 }
-

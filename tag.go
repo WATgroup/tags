@@ -4,7 +4,6 @@
 
 package tags
 
-
 type tag string // private type, to force via constructor
 
 func New(t string) tag {
@@ -12,9 +11,7 @@ func New(t string) tag {
 	return tag(t)
 }
 
-
-
-////////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////
 type tagError string
 
 func (e tagError) Error() string {
