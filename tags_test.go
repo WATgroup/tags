@@ -177,6 +177,26 @@ func TestRoundTrip(t *testing.T) {
 	assert.Equal(t, out, in.String())
 }
 
+func TestAppend(t *testing.T) {
+
+	ts1,_ := tags.Parse("[one,two,three]")
+	ts2,_ := tags.Parse("[four,five,six]")
+
+	t.Run("append-simple", func(t *testing.T) {
+		ts := ts1.Clone()
+		ts.Append(ts2)
+		assert.True(t, tags.EqualSet(ts, g_tagset))
+	})
+	t.Run("append-sort", func(t *testing.T) {
+		ts := ts1
+		ts.Append(ts2)
+		ts.Sort()
+		ref := g_tagset.Clone()
+		ref.Sort()
+		assert.True(t, tags.EqualSet(ts, ref))
+	})
+}
+
 func TestBinarySearch(t *testing.T) {
 
 	ts := g_tagset.Clone()

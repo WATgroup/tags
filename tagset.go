@@ -23,32 +23,38 @@ func FromStrings(tags ...string) (ret Tagset) {
 	return
 }
 
-func (x *Tagset) AddString(tt string) error {
+func (ts *Tagset) AddString(tt string) error {
 	t := tag(tt)
 	if !t.Valid() {
 		return tagError(`invalid tag ` + tt)
 	}
-	*x = append(*x, t)
+	*ts = append(*ts, t)
 	return nil
 }
 
 // Add 't' to the set; There can be duplicates
-func (x *Tagset) Add(t tag) error {
+func (ts *Tagset) Add(t tag) error {
 	if !t.Valid() {
 		return tagError(`invalid tag ` + t)
 	}
-	*x = append(*x, t)
+	*ts = append(*ts, t)
 	return nil
 }
 
+func (ts *Tagset) Append(o Tagset) {
+	for _, x := range o {
+		*ts = append(*ts,x)
+	}
+}
+
 // Remove occurences of "t" in the set
-func (x *Tagset) Remove(t tag) {
-	s := ([]tag)(*x)
+func (ts *Tagset) Remove(t tag) {
+	s := ([]tag)(*ts)
 	i := 0
 	for ; i < len(s); i++ {
 		if t == s[i] {
 			copy(s[i:], s[i+1:])
-			*x = s[:len(s)-1] // reslice in-place; XXX: leaves extra capacity there
+			*ts = s[:len(s)-1] // reslice in-place; XXX: leaves extra capacity there
 		}
 	}
 	return // might not have found the tag
@@ -69,28 +75,28 @@ func EqualSet(t1, t2 Tagset) bool {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-func (x Tagset) Len() int {
-	return len(x)
+func (ts Tagset) Len() int {
+	return len(ts)
 }
 
-func (x Tagset) IsEmpty() bool {
-	return 0 == len(x)
+func (ts Tagset) IsEmpty() bool {
+	return 0 == len(ts)
 }
 
 // Check if tagset contains a tag
 // Linear search will be optimal, given that tagsets are tipically small
-func (x Tagset) Contains(t tag) bool {
-	for i := range x {
-		if t == x[i] {
+func (ts Tagset) Contains(t tag) bool {
+	for i := range ts {
+		if t == ts[i] {
 			return true
 		}
 	}
 	return false
 }
 
-func (x Tagset) ContainsString(t string) bool {
-	for i := range x {
-		if tag(t) == x[i] {
+func (ts Tagset) ContainsString(t string) bool {
+	for _,x := range ts {
+		if tag(t) == x {
 			return true
 		}
 	}
@@ -99,9 +105,9 @@ func (x Tagset) ContainsString(t string) bool {
 
 // Index returns the index of the first occurrence of v in s,
 // or -1 if not present.
-func (x Tagset) Index(t tag) int {
-	for i := range x {
-		if t == x[i] {
+func (ts Tagset) Index(t tag) int {
+	for i,x := range ts {
+		if t == x {
 			return i
 		}
 	}
@@ -110,22 +116,22 @@ func (x Tagset) Index(t tag) int {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-func (x Tagset) Clone() (ret Tagset) {
-	if 0 == len(x) {
+func (ts Tagset) Clone() (ret Tagset) {
+	if 0 == len(ts) {
 		return nil
 	}
-
-	ret = make(Tagset, len(x))
-	for i, t := range x {
-		ret[i] = t
-	}
+	ret = make(Tagset, len(ts))
+// 	for i, t := range ts {
+// 		ret[i] = t
+// 	}
+	copy(ret[:], ts[:])
 	return // ret already contains result
 }
 
 // Remove extra space
-func (x *Tagset) Clip() {
-	s := ([]tag)(*x)
-	*x = s[:len(s):len(s)]
+func (ts *Tagset) Clip() {
+	s := ([]tag)(*ts)
+	*ts = s[:len(s):len(s)]
 }
 
 // ** Equivalent to "uniq"
@@ -133,12 +139,12 @@ func (x *Tagset) Clip() {
 // which may have a smaller length.
 // Compact zeroes the elements between the new length and the original length.
 // The result preserves the nilness of s.
-func (x *Tagset) Compact() {
-	if len(*x) < 2 {
+func (ts *Tagset) Compact() {
+	if len(*ts) < 2 {
 		return
 	}
 
-	s := *x
+	s := *ts
 	for i := 1; i < len(s); i++ {
 		if s[i] == s[i-1] {
 			s2 := s[i:]
@@ -149,7 +155,7 @@ func (x *Tagset) Compact() {
 				}
 			}
 			clear(s[i:]) // zero/nil out the obsolete elements, for GC
-			*x = s[:i]
+			*ts = s[:i]
 		}
 	}
 	return
