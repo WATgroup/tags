@@ -41,17 +41,17 @@ func (x *Tagset) Add(t tag) error {
 	return nil
 }
 
-// Remove first occurence of "t" in the set
+// Remove occurences of "t" in the set
 func (x *Tagset) Remove(t tag) {
 	s := ([]tag)(*x)
 	i := 0
 	for ; i < len(s); i++ {
 		if t == s[i] {
 			copy(s[i:], s[i+1:])
-			break
+			*x = s[:len(s)-1] // reslice in-place; XXX: leaves extra capacity there
 		}
 	}
-	*x = s[:len(s)-1] // reslice in-place; XXX: leaves extra capacity there
+	return // might not have found the tag
 }
 
 func EqualSet(t1, t2 Tagset) bool {

@@ -84,20 +84,54 @@ func TestSorting(t *testing.T) {
 	assert.True(t, tags.EqualSet(ts, ts2))
 }
 
-func TestRemovals(t *testing.T) {
+func TestRemoval(t *testing.T) {
 
 	ts := g_tagset.Clone()
 	// 	fmt.Println(ts)
 
-	ts.Sort()
-	// 	fmt.Println(ts)
+	t.Run("removal -simple", func(t *testing.T) {
+		ts.Sort()
+		// 	fmt.Println(ts)
+		ts.Remove(tags.New("five"))
+		// 	fmt.Println(ts)
+		ts.Remove(tags.New("six"))
+		// 	fmt.Println(ts)
 
-	ts.Remove(tags.New("five"))
-	// 	fmt.Println(ts)
-	ts.Remove(tags.New("six"))
-	// 	fmt.Println(ts)
+		assert.True(t, tags.EqualSet(ts, tags.FromStrings("four", "one", "three", "two")))
+	})
 
-	assert.True(t, tags.EqualSet(ts, tags.FromStrings("four", "one", "three", "two")))
+	t.Run("removal -not-there", func(t *testing.T) {
+		// Remove one non-existing tag...
+		// ...and check we didn't clobber anything valuable :S (bugfix coverage)
+		ts.Remove(tags.New("not-there"))
+		assert.Equal(t, ts.Len(), 4)
+	})
+}
+
+func TestRemoval2(t *testing.T) {
+
+	ts := g_tagset.Clone()
+	//	fmt.Println(ts)
+
+	t.Run("multi-removal", func(t *testing.T) {
+		ts.Remove(tags.New("five"))
+		//	fmt.Println(ts)
+
+		ts.AddString("four")
+		ts.AddString("nine")
+		//	fmt.Println(ts)
+
+		ts.Remove(tags.New("six"))
+		//	fmt.Println(ts)
+		ts.Remove(tags.New("five"))
+
+		ts.Remove(tags.New("four"))
+
+		ts.Sort()
+		//	fmt.Println(ts)
+
+		assert.True(t, tags.EqualSet(ts, tags.FromStrings("four", "nine", "one", "three", "two")))
+	})
 }
 
 func TestContains(t *testing.T) {
